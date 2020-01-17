@@ -49,7 +49,7 @@ rlc.addChart = function(id, type, place, layerId) {
       if(d3 != undefined)
         d = d.concat(d3);
 
-      jrc.callFunction("chartEvent", {d: d, id: id, layerId: layerId, event: "click"}, null, "rlc");
+      jrc.callFunction("chartEvent", {d: d, chartId: id, layerId: layerId, event: "click", sessionId: jrc.id}, null, "rlc");
     });
   if(layerId == "main")
     charts[id].placeIn = place
@@ -61,7 +61,7 @@ rlc.addChart = function(id, type, place, layerId) {
   if(charts[id].on_change && !charts[id].on_drag)
     charts[id].on_change(
       function(value) {
-        jrc.callFunction("chartEvent", {d: value, id: id, layerId: layerId, event: "click"}, null, "rlc");
+        jrc.callFunction("chartEvent", {d: value, chartId: id, layerId: layerId, event: "click", sessionId: jrc.id}, null, "rlc");
       }
     )
 }
@@ -73,12 +73,12 @@ rlc.setCustomMouseOver = function(id, layerId, pacerStep) {
     if(layerId != "main")
       charts[id].get_layer(layerId)
         .on_mouseover(function(d) {
-          pacer.do(function() {jrc.callFunction("chartEvent", {d: d, id: id, layerId: layerId, event: "mouseover"}, null, "rlc")})
+          pacer.do(function() {jrc.callFunction("chartEvent", {d: d, chartId: id, layerId: layerId, event: "mouseover", sessionId: jrc.id}, null, "rlc")})
         });
     else
       charts[id]
         .on_mouseover(function(d) {
-          pacer.do(function() {jrc.callFunction("chartEvent", {d: d, id: id, layerId: layerId, event: "mouseover"}, null, "rlc")}); 
+          pacer.do(function() {jrc.callFunction("chartEvent", {d: d, chartId: id, layerId: layerId, event: "mouseover", sessionId: jrc.id}, null, "rlc")}); 
         });
     charts[id].customMouseOver = true;
   }
@@ -89,12 +89,12 @@ rlc.setCustomMouseOut = function(id, layerId) {
     if(layerId != "main")
       charts[id].get_layer(layerId)
         .on_mouseout(function() {
-          jrc.callFunction("chartEvent", {d: "NULL", id: id, layerId: layerId, event: "mouseout"}, null, "rlc");
+          jrc.callFunction("chartEvent", {d: "NULL", chartId: id, layerId: layerId, event: "mouseout", sessionId: jrc.id}, null, "rlc");
         })
     else
       charts[id]
         .on_mouseout(function() {
-          jrc.callFunction("chartEvent", {d: "NULL", id: id, layerId: layerId, event: "mouseout"}, null, "rlc");
+          jrc.callFunction("chartEvent", {d: "NULL", chartId: id, layerId: layerId, event: "mouseout", sessionId: jrc.id}, null, "rlc");
         });      
     charts[id].customMouseOut = true;
   }
@@ -105,12 +105,12 @@ rlc.setCustomOnMarked = function(id, layerId) {
     if(layerId != "main")
       charts[id].get_layer(layerId)
         .on_marked(function() {
-          jrc.callFunction("chartEvent", {d: "NULL", id: id, layerId: layerId, event: "marked"}, null, "rlc");
+          jrc.callFunction("chartEvent", {d: "NULL", chartId: id, layerId: layerId, event: "marked", sessionId: jrc.id}, null, "rlc");
         })
     else
       charts[id]
         .on_marked(function(d) {
-          jrc.callFunction("chartEvent", {d: "NULL", id: id, layerId: layerId, event: "marked"}, null, "rlc");
+          jrc.callFunction("chartEvent", {d: "NULL", chartId: id, layerId: layerId, event: "marked", sessionId: jrc.id}, null, "rlc");
         });      
     charts[id].customOnMarked = true;
   }
@@ -120,7 +120,7 @@ rlc.setCustomClickLabel = function(id, type) {
   if(!charts[id]["customClickLabel" + type]){
     charts[id]
       ["on_labelClick" + type](function(d) {
-        jrc.callFunction("chartEvent", {d: d, id: id, layerId: "main", event: "labelClick" + type}, null, "rlc")
+        jrc.callFunction("chartEvent", {d: d, chartId: id, layerId: "main", event: "labelClick" + type, sessionId: jrc.id}, null, "rlc")
       });      
     charts[id]["customClickLabel" + type] = true;
   }
@@ -133,14 +133,6 @@ rlc.setProperty = function(name) {
     charts[id].activeLayer(charts[id].get_layer(spl[1]));
   for(pr in window[name]) {
     if(pr == "paddings"){
-      if(window[name][pr].top)
-        window[name][pr].top = window[name][pr].top[0];
-      if(window[name][pr].bottom)
-        window[name][pr].bottom = window[name][pr].bottom[0];
-      if(window[name][pr].left)
-        window[name][pr].left = window[name][pr].left[0];
-      if(window[name][pr].right)
-        window[name][pr].right = window[name][pr].right[0];
       charts[id].set_paddings(window[name][pr]);
     } else if(pr == "rankRows") {
       orderRow = window[name][pr];
@@ -175,7 +167,7 @@ rlc.getMarked = function(id, layerId) {
   if(marked.empty)
     marked = marked.data();
 
-  jrc.sendData("marked", marked);
+  jrc.sendData(".marked", marked);
 }
 
 rlc.mark = function(id, layerId, pe) {

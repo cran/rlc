@@ -4,29 +4,31 @@
 \alias{setProperties}
 \title{Set properties of the chart}
 \usage{
-setProperties(data, id, layerId = NULL)
+setProperties(data, chartId, layerId = NULL)
 }
 \arguments{
-\item{data}{Set of properties to be redefined for this layer or chart. Created by \code{\link{dat}}
+\item{data}{List of properties to be redefined for this layer or chart. Created by the \code{\link{dat}}
 function.}
 
-\item{id}{ID of the chart, whose properties you want to redefine.}
+\item{chartId}{ID of the chart, for which to redefine properties.}
 
-\item{layerId}{ID of the layer, whose properties you want to redefine. If the chart has a single
+\item{layerId}{ID of the layer, for which to redefine properties. If the chart has a single
 layer or doesn't have layers, default value (which is NULL) can be used.}
 }
 \description{
-Changes already defined properties or sets the new ones for an
-existing chart.
+Sets or resets properties for an
+existing chart. Changes will be applied to all currently opened and future pages.
+This function is a wrapper around method \code{setProperties} of class \code{\link{LCApp}}.
 }
 \examples{
 \donttest{data("iris")
-lc_scatter(dat(x = iris$Sepal.Length, y = iris$Sepal.Width), id = "irisScatter")
-setProperties(dat(symbolValue = iris$Species, y = iris$Petal.Length), id = "irisScatter")
+lc_scatter(dat(x = iris$Sepal.Length, y = iris$Sepal.Width), chartId = "irisScatter")
+setProperties(dat(symbolValue = iris$Species, y = iris$Petal.Length), chartId = "irisScatter")
 updateCharts("irisScatter")
 
-lc_line(dat(x = iris$Sepal.Length, y = iris$Petal.Length), id = "irisScatter", layerId = "line")
-setProperties(dat(colour = "red"), id = "irisScatter", layerId = "line")
+lc_line(dat(x = iris$Sepal.Length, y = iris$Petal.Length), chartId = "irisScatter", 
+        layerId = "line")
+setProperties(dat(colour = "red"), chartId = "irisScatter", layerId = "line")
 updateCharts("irisScatter")}
 
 }
