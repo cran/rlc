@@ -66,37 +66,50 @@ rlc.addChart = function(id, type, place, layerId) {
     )
 }
 
+rlc.setCustomClickPosition = function(id) {
+  if(charts[id].clickPosition) {
+    charts[id].on_clickPosition(function(x, y) {
+      jrc.callFunction("chartEvent", {d: [x, y], chartId: id, layerId: "main", event: "clickPosition", sessionId: jrc.id}, null, "rlc");
+    })
+  }
+}
+
 rlc.setCustomMouseOver = function(id, layerId, pacerStep) {
   if(!charts[id].customMouseOver){
-    var pacer = lc.call_pacer(pacerStep); 
+    if(!charts[id].pacer)
+      charts[id].pacer = lc.call_pacer(pacerStep); 
 
     if(layerId != "main")
       charts[id].get_layer(layerId)
         .on_mouseover(function(d) {
-          pacer.do(function() {jrc.callFunction("chartEvent", {d: d, chartId: id, layerId: layerId, event: "mouseover", sessionId: jrc.id}, null, "rlc")})
+          charts[id].pacer.do(function() {jrc.callFunction("chartEvent", {d: d, chartId: id, layerId: layerId, event: "mouseover", sessionId: jrc.id}, null, "rlc")})
         });
     else
       charts[id]
         .on_mouseover(function(d) {
-          pacer.do(function() {jrc.callFunction("chartEvent", {d: d, chartId: id, layerId: layerId, event: "mouseover", sessionId: jrc.id}, null, "rlc")}); 
+          charts[id].pacer.do(function() {jrc.callFunction("chartEvent", {d: d, chartId: id, layerId: layerId, event: "mouseover", sessionId: jrc.id}, null, "rlc")}); 
         });
     charts[id].customMouseOver = true;
   }
 }
 
-rlc.setCustomMouseOut = function(id, layerId) {
+rlc.setCustomMouseOut = function(id, layerId, pacerStep) {
   if(!charts[id].customMouseOut){
-    if(layerId != "main")
-      charts[id].get_layer(layerId)
-        .on_mouseout(function() {
-          jrc.callFunction("chartEvent", {d: "NULL", chartId: id, layerId: layerId, event: "mouseout", sessionId: jrc.id}, null, "rlc");
-        })
-    else
-      charts[id]
-        .on_mouseout(function() {
-          jrc.callFunction("chartEvent", {d: "NULL", chartId: id, layerId: layerId, event: "mouseout", sessionId: jrc.id}, null, "rlc");
-        });      
-    charts[id].customMouseOut = true;
+    if(!charts[id].pacer)
+      charts[id].pacer = lc.call_pacer(pacerStep); 
+
+    if(!charts[id].customMouseOut)
+      if(layerId != "main")
+        charts[id].get_layer(layerId)
+          .on_mouseout(function() {
+            charts[id].pacer.do(function() {jrc.callFunction("chartEvent", {d: "NULL", chartId: id, layerId: layerId, event: "mouseout", sessionId: jrc.id}, null, "rlc")});
+          })
+      else
+        charts[id]
+          .on_mouseout(function() {
+            charts[id].pacer.do(function() {jrc.callFunction("chartEvent", {d: "NULL", chartId: id, layerId: layerId, event: "mouseout", sessionId: jrc.id}, null, "rlc")});
+          });      
+      charts[id].customMouseOut = true;
   }
 }
 
@@ -127,7 +140,7 @@ rlc.setCustomClickLabel = function(id, type) {
 }
 
 rlc.setProperty = function(name) {
-  var spl = name.split("_");
+  var spl = name.split("_sep_");
   var id = spl[0];
   if(spl[1] != "main")
     charts[id].activeLayer(charts[id].get_layer(spl[1]));

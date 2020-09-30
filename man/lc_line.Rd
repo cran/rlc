@@ -15,7 +15,9 @@ lc_line(
   ...,
   chartId = NULL,
   layerId = NULL,
-  addLayer = FALSE
+  with = NULL,
+  addLayer = FALSE,
+  pacerStep = 50
 )
 
 lc_path(
@@ -24,7 +26,9 @@ lc_path(
   ...,
   chartId = NULL,
   layerId = NULL,
-  addLayer = FALSE
+  with = NULL,
+  addLayer = FALSE,
+  pacerStep = 50
 )
 
 lc_ribbon(
@@ -33,6 +37,7 @@ lc_ribbon(
   ...,
   chartId = NULL,
   layerId = NULL,
+  with = NULL,
   addLayer = FALSE
 )
 
@@ -42,7 +47,9 @@ lc_abLine(
   ...,
   chartId = NULL,
   layerId = NULL,
-  addLayer = FALSE
+  with = NULL,
+  addLayer = FALSE,
+  pacerStep = 50
 )
 
 lc_hLine(
@@ -51,7 +58,9 @@ lc_hLine(
   ...,
   chartId = NULL,
   layerId = NULL,
-  addLayer = FALSE
+  with = NULL,
+  addLayer = FALSE,
+  pacerStep = 50
 )
 
 lc_vLine(
@@ -60,7 +69,9 @@ lc_vLine(
   ...,
   chartId = NULL,
   layerId = NULL,
-  addLayer = FALSE
+  with = NULL,
+  addLayer = FALSE,
+  pacerStep = 50
 )
 }
 \arguments{
@@ -82,9 +93,16 @@ where \code{N - 1} is the number of existing charts.}
 ID already exists, it will be replaced. If not defined, will be set to \code{LayerN}, where \code{N - 1}
 is the number of currently existing layers in this chart.}
 
+\item{with}{A data set from which other properties should be taken. If the data set doesn't have a
+column with the requested name, the variable will be searched for outside of the data set. Must be
+a data.frame or a list.}
+
 \item{addLayer}{if there is already a chart with the same ID, this argument defines whether to replace it or to add a
 new layer to it. This argument is ignored if both \code{place} and \code{chartId} are \code{NULL} or if there is no
 chart with the given ID.}
+
+\item{pacerStep}{Time in ms between two consecutive calls of an \code{on_mouseover} event. Prevents overqueuing in case
+of cumbersome computations. May be important when the chart works in canvas mode.}
 }
 \description{
 These functions create various kinds of lines. They connect observations or
@@ -152,7 +170,7 @@ is automatically set to include all layer domains.
 \item \code{axisTitlePosX, axisTitlePosY} - position of axes titles. For each axis one can specify title position
 across or along the corresponding axis. Possible options are \code{"up"} (for title inside the plotting area)
 or \code{"down"} (outside the plotting area, under the axis), and
-\code{"start"}, \code{"middle"}, \code{"end"}. This property must be a string with one or two of the abovementioned options
+\code{"start"}, \code{"middle"}, \code{"end"}. This property must be a string with one or two of the aforementioned options
 (e.g. \code{"middle down"}, \code{"start"}, etc.).
 \item \code{ticksRotateX, ticksRotateY} - angle by which to rotate ticks (in degrees). Must be between
 0 (horizontal ticks, default) and 90 (vertical ticks).
@@ -162,6 +180,11 @@ Interactivity settings
 \itemize{
 \item \code{on_click} - function, to be called, when one of the lines is clicked. Gets an
 index of the clicked line as an argument.
+\item \code{on_positionClick} - function, to be called, when any point of the chart is clicked. Unlike
+\code{on_click} which is called only when an element of the chart (point, line, etc.) is clicked, this
+function reacts to any click on the chart. As an argument it receives a vector of x and y coordinates of
+the click (based on the current axes scales). If one of the axes is categorical, then the function will
+get the closest tick to the clicked position.
 \item \code{on_mouseover} - function, to be called, when mouse hovers over one of the lines.
 Gets an index of the clicked line as an argument.
 \item \code{on_mouseout} - function, to be called, when mouse moves out of one of the lines.
@@ -181,7 +204,7 @@ Global chart settings
 \item \code{titleX, titleY} - coordinates of the chart title.
 \item \code{titleSize} - font-size of the chart title.
 \item \code{showLegend} - whether or not to show the legend.
-\item \code{showPanel} - whether of not to show the instrument panel (grey triangle in the upper-left corner of the chart).
+\item \code{showPanel} - whether of not to show the instrument panel (gray triangle in the upper-left corner of the chart).
 \item \code{transitionDuration} - duration of the transitions between any two states of the chart. If 0,
 no animated transition is shown. It can be useful to turn the transition off, when lots of frequent
 changes happen to the chart.
