@@ -76,7 +76,7 @@ lc_vLine(
 }
 \arguments{
 \item{data}{Name value pairs of properties, passed through the \code{\link{dat}} function. These
-properties will be reevaluated on each \code{\link{updateCharts}} call.}
+properties will be re-evaluated on each \code{\link{updateCharts}} call.}
 
 \item{place}{ID of a container, where to place new chart. Will be ignored if the chart already
 exists. If not defined, the chart will be appended to the body of the web pages.}
@@ -101,7 +101,7 @@ a data.frame or a list.}
 new layer to it. This argument is ignored if both \code{place} and \code{chartId} are \code{NULL} or if there is no
 chart with the given ID.}
 
-\item{pacerStep}{Time in ms between two consecutive calls of an \code{on_mouseover} event. Prevents overqueuing in case
+\item{pacerStep}{Time in ms between two consecutive calls of an \code{on_mouseover} event. Prevents over-queueing in case
 of cumbersome computations. May be important when the chart works in canvas mode.}
 }
 \description{
@@ -138,7 +138,10 @@ vectors for a single line or \code{m x n} matrix for \code{n} lines.
 \item \code{lineWidth} - (nor for \code{lc_ribbon}) width of each line.
 \item \code{opacity} - opacity of each line in the range from 0 to 1.
 \item \code{label} - vector of text labels for each line (labels by default are shown, when mouse hovers over a line).
-\item \code{dasharray} - defines pattern of dashes and gaps for each line. }
+\item \code{dasharray} - defines pattern of dashes and gaps for each line.
+\item \code{informText} - text that appears when the mouse cursor moves over an element. Unlike \code{label},
+completely overwrites the tooltip content with a custom HTML code. Must be a vector of characters (HTML code
+for each element).}
 
 Colour settings
 \itemize{
@@ -180,7 +183,7 @@ Interactivity settings
 \itemize{
 \item \code{on_click} - function, to be called, when one of the lines is clicked. Gets an
 index of the clicked line as an argument.
-\item \code{on_positionClick} - function, to be called, when any point of the chart is clicked. Unlike
+\item \code{on_clickPosition} - function, to be called, when any point of the chart is clicked. Unlike
 \code{on_click} which is called only when an element of the chart (point, line, etc.) is clicked, this
 function reacts to any click on the chart. As an argument it receives a vector of x and y coordinates of
 the click (based on the current axes scales). If one of the axes is categorical, then the function will
@@ -191,6 +194,17 @@ Gets an index of the clicked line as an argument.
 \item \code{on_marked} - function, to be called, when any of the lines are selected (marked)
 or deselected. Use \code{\link{getMarked}} function to get the IDs of the currently marked lines. To mark lines,
 select them with your mouse while holding the \emph{Shift} key.}
+
+Legend settings
+\itemize{
+\item \code{legend_width} - width of the legend in pixels. The default value is 200.
+\item \code{legend_height} - height of the legend in pixels. By default, it is equal to the height of the chart.
+\item \code{legend_sampleHeight} - height of a single key of the legend in pixels. The default value is 20.
+\item \code{legend_ncol} - number of columns to order several legends. By default, this is defined from the number
+of legends to reach close to square shape.
+\item \code{legend_container} - a DOM element of the web page where to place the legend. By default, the legend is
+positioned to the right from the chart in a table cell specifically made for it. This should be a valid CSS selector.
+If the specified element does not exist, the legend will be added to the body of the web page.}\
 
 Global chart settings
 \itemize{
@@ -204,7 +218,7 @@ Global chart settings
 \item \code{titleX, titleY} - coordinates of the chart title.
 \item \code{titleSize} - font-size of the chart title.
 \item \code{showLegend} - whether or not to show the legend.
-\item \code{showPanel} - whether of not to show the instrument panel (gray triangle in the upper-left corner of the chart).
+\item \code{showPanel} - whether of not to show the instrument panel (grey triangle in the upper-left corner of the chart).
 \item \code{transitionDuration} - duration of the transitions between any two states of the chart. If 0,
 no animated transition is shown. It can be useful to turn the transition off, when lots of frequent
 changes happen to the chart.
