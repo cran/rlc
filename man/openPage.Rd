@@ -11,6 +11,7 @@ openPage(
   layout = NULL,
   port = NULL,
   browser = NULL,
+  onlyServer = FALSE,
   ...
 )
 }
@@ -39,6 +40,8 @@ will be used (see \code{\link[httpuv]{randomPort}}).}
 \item{browser}{A browser in which to open a new web page.
 If not defined, default browser will be used. For more information check \code{\link[utils]{browseURL}}.
 If this argument is specified, \code{useViewer} will be ignored.}
+
+\item{onlyServer}{If \code{TRUE}, then an app will initialise without trying to open a new page in a browser.}
 
 \item{...}{Further arguments passed to \code{\link[jrc]{openPage}}. Check details for more information.}
 }
