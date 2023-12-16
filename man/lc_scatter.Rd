@@ -63,13 +63,13 @@ or continuous.
 }
 \section{Functions}{
 \itemize{
-\item \code{lc_scatter}: creates a scatterplot and adds it as a new layer to an existing chart or
+\item \code{lc_scatter()}: creates a scatterplot and adds it as a new layer to an existing chart or
 creates a new one.
 
-\item \code{lc_beeswarm}: creates a special kind of scatterplot, where the points are spread along one of
+\item \code{lc_beeswarm()}: creates a special kind of scatterplot, where the points are spread along one of
 the axes to avoid overlapping.
-}}
 
+}}
 \section{Available properties}{
 
 You can read more about different properties
@@ -176,7 +176,7 @@ changes happen to the chart.}
 }
 
 \examples{
-\donttest{data("iris")
+\dontrun{data("iris")
 lc_scatter(dat(x = Sepal.Length, 
                y = Petal.Length,
                colourValue = Petal.Width,

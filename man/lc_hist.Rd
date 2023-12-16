@@ -58,11 +58,11 @@ and either add them as a new layer to an existing chart or create a new chart.
 }
 \section{Functions}{
 \itemize{
-\item \code{lc_hist}: makes a histogram. It is an extension of \code{\link{lc_bars}}.
+\item \code{lc_hist()}: makes a histogram. It is an extension of \code{\link{lc_bars}}.
 
-\item \code{lc_dens}: makes a density plot. Is an extension of \code{\link{lc_line}}.
+\item \code{lc_dens()}: makes a density plot. Is an extension of \code{\link{lc_line}}.
+
 }}
-
 \section{Available properties}{
 
 You can read more about different properties
@@ -77,7 +77,7 @@ These functions are extensions of \code{\link{lc_line}} (\code{lc_dens}) or \cod
 }
 
 \examples{
-\donttest{
+\dontrun{
 lc_hist(dat(value = rnorm(1000), nbins = 30, height = 300))
 lc_dens(dat(value = rnorm(1000), height = 300)) }
 

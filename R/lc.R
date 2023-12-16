@@ -199,7 +199,7 @@ pkg.env$dataFun <- list(
     if(is.null(l$groupIds)) l$groupIds <- rep("group", length(l$value))
     if(is.null(l$barIds)) l$barIds <- rep(1, length(l$value))
     if(is.null(l$stackIds)) l$stackIds <- rep(1, length(l$value))
-    
+
     ngroups <- length(unique(l$groupIds))
     nbars <- length(unique(l$barIds))
     nstacks <- length(unique(l$stackIds))
@@ -212,6 +212,18 @@ pkg.env$dataFun <- list(
     if(is.numeric(l$groupIds) & !is.integer(l$groupIds)){
       inds <- unique(l$groupIds)
       l$groupIds <- match(l$groupIds, inds)
+    }
+    
+    if(is.null(l$hist)) {
+      if(!(length(l$barIds) == 1 && l$barIds == 1)) l$barLabel <- unique(l$barIds)
+      if(!(length(l$stackIds) == 1 && l$stackIds == 1)) l$stackLabel <- unique(l$stackIds)
+      if(!(length(l$groupIds) == 1 && l$groupIds == "group")) l$groupLabel <- unique(l$groupIds)
+      
+      l$barIds <- as.numeric(as.factor(l$barIds)) - 1
+      l$stackIds <- as.numeric(as.factor(l$stackIds)) - 1
+      l$groupIds <- as.numeric(as.factor(l$groupIds)) - 1    
+    } else {
+      l$hist <- NULL
     }
     
     vals <- list()
@@ -256,6 +268,8 @@ pkg.env$dataFun <- list(
     l$addColourScaleToLegend <- FALSE
     l$groupWidth <- 1
     
+    l$hist <- TRUE
+    
     if(!is.null(l$value)) {
       minV <- min(l$value, na.rm = TRUE)
       maxV <- max(l$value, na.rm = TRUE)
@@ -298,10 +312,7 @@ pkg.env$dataFun <- list(
       if(is.null(l$colLabel) & !is.null(colnames(l$value)))
         l$colLabel <- colnames(l$value)
     }
-    
-    if(is.null(l$colourLegendTitle))
-      l$colourLegendTitle <- ""    
-    
+
     l
   },
   
@@ -907,7 +918,6 @@ LCApp <- R6Class("LCApp", inherit = App, public = list(
         layerId <- chart$getLayerIds()[2]
       }
     }
-
     if(!is.null(chart$getLayer(layerId)))
       chart$removeLayer(layerId)
     
@@ -1010,7 +1020,7 @@ LCApp <- R6Class("LCApp", inherit = App, public = list(
                        "logScaleX", "logScaleY", "ticksRotateX", "ticksRotateY", "globalColourScale", "aspectRatio",
                        "rankRows", "rankCols", "ticksX", "ticksY", "showDendogramCol", "on_labelClickCol", "on_labelClickRow",
                        "axisTitlePosX", "axisTitlePosY", "legend_width", "legend_height", "legend_sampleHeight", "legend_ncol",
-                       "legend_titles", "legend_container", "informText", "valueTextColour")),
+                       "legend_titles", "legend_container", "informText", "valueTextColour", "legendTitle")),
   nameList = c("labels" = "label", "color" = "colour", "colorValue" = "colourValue",
                "colourValues" = "colourValue", "colorValues" = "colourValue", "colorDomain" = "colourDomain",
                "colorLegendTitle" = "colourLegendTitle", "addColorScaleToLegend" = "addColourScaleToLegend",
@@ -1303,7 +1313,7 @@ Chart <- R6Class("Chart", public = list(
 #' @return A new instance of class \code{\link{LCApp}}.
 #' 
 #' @examples
-#' \donttest{openPage()
+#' \dontrun{openPage()
 #' 
 #' openPage(useViewer = FALSE, layout = "table2x3")}
 #' 
@@ -1361,7 +1371,7 @@ getAppAndSession <- function(sessionId = NULL, app = NULL, all = TRUE) {
 #' @param chartId A vector of IDs of the charts to be removed.
 #' 
 #' @examples 
-#' \donttest{lc_scatter(dat(x = 1:10, y = 1:10 * 2), chartId = "scatter")
+#' \dontrun{lc_scatter(dat(x = 1:10, y = 1:10 * 2), chartId = "scatter")
 #' removeChart("scatter")}
 #' 
 #' @export
@@ -1381,7 +1391,7 @@ removeChart <- function(chartId) {
 #' @param layerId ID of the layer to remove.
 #' 
 #' @examples 
-#' \donttest{lc_scatter(dat(x = 1:10, y = 1:10 * 2), chartId = "scatter")
+#' \dontrun{lc_scatter(dat(x = 1:10, y = 1:10 * 2), chartId = "scatter")
 #' lc_abLine(a = 2, b = 0, chartId = "scatter", addLayer = TRUE)
 #' removeLayer("scatter", "Layer1")}
 #' 
@@ -1408,7 +1418,7 @@ removeLayer <- function(chartId, layerId) {
 #' a \code{data.frame} or a \code{list}.
 #' 
 #' @examples
-#' \donttest{data("iris")
+#' \dontrun{data("iris")
 #' lc_scatter(dat(x = iris$Sepal.Length, y = iris$Sepal.Width), chartId = "irisScatter")
 #' setProperties(dat(symbolValue = iris$Species, y = iris$Petal.Length), chartId = "irisScatter")
 #' updateCharts("irisScatter")
@@ -1503,7 +1513,7 @@ setProperties <- function(data, chartId, layerId = NULL, with = NULL) {
 #' \code{Canvas}, \code{Size}. See details for more information.
 #' 
 #' @examples
-#' \donttest{data(iris)
+#' \dontrun{data(iris)
 #'
 #' #store some properties in global variables
 #' width <- 300
@@ -1561,7 +1571,7 @@ updateCharts <- function(chartId = NULL, layerId = NULL, updateOnly = NULL) {
 #' internal use, and its default value is a variable stored in each session locally. If you are not using wrapper functions, 
 #' it is preferred to call method \code{chartEvent} of an object of class \code{\link{LCApp}}.
 #' @examples 
-#' \donttest{x <- rnorm(50)
+#' \dontrun{x <- rnorm(50)
 #' lc_scatter(x = x, y = 2*x + rnorm(50, 0.1), on_click = function(d) print(d))
 #' chartEvent(51, "Chart1", "Layer1", "click")}
 #' 
@@ -1586,7 +1596,7 @@ chartEvent <- function(d, chartId, layerId = "main", event, sessionId = .id, app
 #' This function is wrapper around method \code{listCharts} of class \code{\link{LCApp}}.
 #' 
 #' @examples 
-#' \donttest{noise <- rnorm(30)
+#' \dontrun{noise <- rnorm(30)
 #' x <- seq(-4, 4, length.out = 30)
 #' 
 #' lc_scatter(dat(x = x,
@@ -1623,7 +1633,7 @@ listCharts <- function() {
 #' second columns contain row and column indices of the marked cells, respectively.
 #' 
 #' @examples
-#' \donttest{data(iris)
+#' \dontrun{data(iris)
 #' 
 #' lc_scatter(dat(x = iris$Sepal.Length, y = iris$Petal.Length))
 #' 
@@ -1660,7 +1670,7 @@ getMarked <- function(chartId = NULL, layerId = NULL, sessionId = NULL) {
 #' the corresponding session will be used automatically.
 #'
 #' @examples 
-#' \donttest{data("iris")
+#' \dontrun{data("iris")
 #' openPage(FALSE, layout = "table1x2")
 #' 
 #' #brushing example
@@ -1716,6 +1726,31 @@ getPage <- function(){
   pkg.env$app
 }
 
+#' Listen to the server
+#' 
+#' When R session is not interactive, messages from the server are not processed automatically. In this case, one needs to 
+#' keep this function running.
+#' This function, is a wrapper around \code{\link[jrc]{listen}}.
+#' 
+#' @param time Time (in seconds), during which the R session should listen to the server. By default, the function runs until
+#' it is not interrupted (\code{time = Inf}).
+#' @param activeSessions The function runs, until there is at least one active session in the provided app. If there is only
+#' one active app, this argument can be set to \code{TRUE} for the same effect.
+#' @param condition Custom condition. This argument must be a function that returns \code{TRUE} or \code{FALSE}. R session will 
+#' listen to the server, while the condition function returns \code{TRUE}.
+#' 
+#' @importFrom jrc listen
+#' @export
+listen <- function(time = Inf, activeSessions = NULL, condition = NULL) {
+  if(isTRUE(activeSessions)) {
+    if(is.null(pkg.env$app)) 
+      stop("There is no opened page. Please, use 'openPage()' function to create one.")
+    activeSessions <- pkg.env$app
+  }
+  
+  jrc::listen(time = time, activeSessions = activeSessions, condition = condition)
+}
+
 #' Link data to the chart
 #' 
 #' \code{dat} allows linking variables from the current environment to chart's properties.
@@ -1727,7 +1762,7 @@ getPage <- function(){
 #' @param ... List of name-value pairs to define the properties. 
 #' 
 #' @examples 
-#' \donttest{lc_scatter(dat(x = rnorm(30)), y = rnorm(30))
+#' \dontrun{lc_scatter(dat(x = rnorm(30)), y = rnorm(30))
 #' #note that the Y values remain the same after each updateCharts call
 #' updateCharts()
 #' 
@@ -1750,7 +1785,7 @@ dat <- function( ... ) {
 #' wrapper of the \code{stopServer} method inherited by the \code{\link{LCApp}} class from the \code{\link[jrc]{App}} class.
 #' 
 #' @examples 
-#' \donttest{openPage(useViewer = FALSE)
+#' \dontrun{openPage(useViewer = FALSE)
 #' closePage()}
 #' 
 #' @export
@@ -1897,7 +1932,7 @@ closePage <- function() {
 #'  changes happen to the chart.} 
 #' 
 #' @examples
-#' \donttest{data("iris")
+#' \dontrun{data("iris")
 #' lc_scatter(dat(x = Sepal.Length, 
 #'                y = Petal.Length,
 #'                colourValue = Petal.Width,
@@ -2071,7 +2106,7 @@ lc_beeswarm <- function(data = list(), place = NULL, ..., chartId = NULL, layerI
 #' } 
 #' 
 #' @examples 
-#' \donttest{x <- seq(0, 8, 0.2)
+#' \dontrun{x <- seq(0, 8, 0.2)
 #' lc_line(dat(x = x, y = cbind(cos(x), sin(x)),
 #'             aspectRatio = 1,
 #'             colour = c("blue", "red"),
@@ -2251,7 +2286,7 @@ lc_ribbon <- function(data = list(), place = NULL, ..., chartId = NULL, layerId 
 #'  changes happen to the chart.} 
 #'   
 #' @examples 
-#' \donttest{data("esoph")
+#' \dontrun{data("esoph")
 #' 
 #' lc_bars(dat(value = tapply(esoph$ncases, esoph$agegp, sum), 
 #'             title = "Number of cases per age group",
@@ -2329,7 +2364,7 @@ lc_bars <- function(data = list(), place = NULL, ..., chartId = NULL, layerId = 
 #' @describeIn lc_hist makes a histogram. It is an extension of \code{\link{lc_bars}}.
 #' 
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' lc_hist(dat(value = rnorm(1000), nbins = 30, height = 300))
 #' lc_dens(dat(value = rnorm(1000), height = 300)) }
 #' 
@@ -2449,7 +2484,7 @@ lc_dens <- function(data = list(), place = NULL, ..., chartId = NULL, layerId = 
 #'  no animated transition is shown. It can be useful to turn the transition off, when lots of frequent 
 #'  changes happen to the chart.} 
 #' @examples 
-#' \donttest{
+#' \dontrun{
 #' library(RColorBrewer)
 #' #create a test matrix
 #' test <- cbind(sapply(1:10, function(i) c(rnorm(10, mean = 1, sd = 3), 
@@ -2526,7 +2561,7 @@ lc_heatmap <- function(data = list(), place = NULL, ..., chartId = NULL, with = 
 #'  \item \code{titleSize} - font-size of the chart title.} 
 #' 
 #' @examples 
-#' \donttest{data("iris")
+#' \dontrun{data("iris")
 #' lc_scatter(dat(x = Sepal.Length, 
 #'                y = Petal.Length,
 #'                colourValue = Petal.Width,
@@ -2629,7 +2664,7 @@ lc_vLine <- function(data = list(), place = NULL, ..., chartId = NULL, layerId =
 #'  \code{"top", "bottom", "left", "right"}.}
 #'  
 #' @examples
-#' \donttest{lc_html(content = "Some <b>HTML</b> <br> <i>code</i>.")
+#' \dontrun{lc_html(content = "Some <b>HTML</b> <br> <i>code</i>.")
 #' lc_html(dat(content = matrix(1:12, nrow = 4)))
 #' data(iris)
 #' lc_html(content = iris, height = 200)}
@@ -2701,7 +2736,7 @@ lc_html <- function(data = list(), place = NULL, ..., chartId = NULL, with = NUL
 #'  \code{"top", "bottom", "left", "right"}.}
 #'
 #'@examples
-#' \donttest{lc_input(type = "checkbox", labels = paste0("el", 1:5), on_click = function(value) print(value),
+#' \dontrun{lc_input(type = "checkbox", labels = paste0("el", 1:5), on_click = function(value) print(value),
 #' value = TRUE)
 #' lc_input(type = "radio", labels = paste0("el", 1:5), on_click = function(value) print(value),
 #'          value = 1)
@@ -2763,7 +2798,7 @@ lc_input <- function(data = list(), place = NULL, ..., chartId = NULL, with = NU
 #'  \code{"top", "bottom", "left", "right"}.}
 #'
 #'@examples
-#' \donttest{
+#' \dontrun{
 #' library(ggplot2)
 #' pl <- ggplot() + geom_point(aes(1:10, 1:10))
 #' 
